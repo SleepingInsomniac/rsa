@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift(File.join(__dir__, '../lib'))
+
+require 'rsa'
+
+cypher = RSA::Enigma.new 1024
+cypher.info
+max_length = (cypher.semi_prime.to_s(2).length / 8)
+begin
+  print "\nInput Message (max length: #{max_length} characters): "
+  message = gets.chomp
+  secret = cypher.encrypt message
+rescue
+  puts "Message cannot be longer than modulus..."
+  retry
+end
+
+decrypted = cypher.decrypt secret
+
+puts <<~OUT
+  Message: #{message}
+  Encrypted:\n#{RSA::Ascii.str_to_block secret.to_s(16)}
+  Decrypted: #{decrypted}
+  Success: #{message == decrypted}
+OUT
